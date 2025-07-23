@@ -3,7 +3,12 @@ import requests
 import pandas as pd
 from streamlit_modal import Modal
 from io import BytesIO
+import os
 
+
+
+backend_host = os.environ.get("BACKEND_HOST", "http://127.0.0.1:8000")
+print(os.environ.get("BACKEND_HOST"))
 st.set_page_config(layout="wide", page_title="DataTool")
 
 tab1, tab2 = st.tabs(["Jobs", "Config"])
@@ -58,7 +63,7 @@ with tab1:
                             }
                             
                             
-                            api_url = "http://127.0.0.1:8000/jobs/"
+                            api_url = f"{backend_host}/jobs/"
                             
                             
                             response = requests.post(api_url, json=payload)
@@ -84,7 +89,7 @@ with tab1:
         if st.button("Get Job"):
         # job_id = 16
             # st.session_state.job_id = job_id
-            job_data = requests.get("http://127.0.0.1:8000/jobs/readfull/{}".format(job_id))
+            job_data = requests.get(f"{backend_host}/jobs/readfull/{job_id}")
             if job_data.status_code == 200:
                 steps = job_data.json()
                 steps1 = job_data.json()
@@ -106,7 +111,7 @@ with tab1:
         # st.write("")
         # st.write("")
         if st.button("Activate"):
-            job_data = requests.post("http://127.0.0.1:8000/jobs/{}/activate".format(job_id))
+            job_data = requests.post(f"{backend_host}/jobs/{job_id}/activate")
             if job_data.status_code >= 200 and job_data.status_code < 300:
                 st.toast("Job Activated")
             else:
@@ -136,7 +141,7 @@ with tab1:
                                     "folder": f'Job-{job_id_folder}',
                                     "file": uploaded_file.name
                                 }
-                    presigned_url = requests.post('http://127.0.0.1:8000/uploadurl', json=payload)
+                    presigned_url = requests.post(f'{backend_host}/uploadurl', json=payload)
                     print(presigned_url.json())
                     response = requests.put(
                         presigned_url.json(),
@@ -171,7 +176,7 @@ with tab1:
         if st.button("Complete"):
             # print(job_id, job_counter, job_subcounter)
             if (job_id > 0) and (job_counter > 0) and (job_subcounter > 0):
-                job_data = requests.post("http://127.0.0.1:8000/jobs/{}/counter/{}/subcounter/{}/complete".format(job_id, job_counter, job_subcounter))
+                job_data = requests.post(f"{backend_host}/jobs/{job_id}/counter/{job_counter}/subcounter/{job_subcounter}/complete")
                 if job_data.status_code >= 200 and job_data.status_code < 300:
                     st.toast("Job Marked Complete", icon="✅")  
                 else:
@@ -200,7 +205,7 @@ with tab1:
                                 "file": "dummy"
                                 }
                     # f'Job-{st.session_state.job_id}',
-                    presigned_url = requests.post('http://127.0.0.1:8000/downloadurl', json=payload)
+                    presigned_url = requests.post(f'{backend_host}/downloadurl', json=payload)
                     print(presigned_url.json())
 
                     items_url = presigned_url.json()
@@ -221,7 +226,7 @@ with tab2:
         st.write("")
         st.write("")
         if st.button("Get Object"):
-            object_data = requests.get("http://127.0.0.1:8000/links/object/{}".format(object_id))
+            object_data = requests.get(f"f{backend_host}/links/object/{object_id}")
             st.session_state.df_object = pd.DataFrame(object_data.json())
 
     if 'df_object' not in st.session_state:

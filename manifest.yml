@@ -1,0 +1,14 @@
+---
+applications:
+- name: datatool
+  routes:
+  - route: adr-datatool-frontend.cfapps.us10-001.hana.ondemand.com
+  # random-route: true
+  path: ./
+  memory: 256M
+  disk-quota: 1024M
+  buildpacks: 
+  - python_buildpack
+  command: streamlit run main.py
+  env:
+    BACKEND_HOST: https://dev-datatool-frontend.cfapps.us10-001.hana.ondemand.com
